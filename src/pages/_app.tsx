@@ -1,16 +1,29 @@
-import {AppProps} from 'next/app'
-import { ChakraProvider } from '@chakra-ui/react'
-import {theme} from '../styles/theme'
-import { SidebarDrawerProvider } from '../context/SidebarDrawerContent'
+import { AppProps } from "next/app";
+import { ChakraProvider } from "@chakra-ui/react";
+import { theme } from "../styles/theme";
+import { SidebarDrawerProvider } from "../context/SidebarDrawerContent";
+import { makeServer } from "../service/mirage";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "../service/queryClient";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return(
-    <ChakraProvider theme={theme}>
-      <SidebarDrawerProvider>
-        <Component {...pageProps} />
-      </SidebarDrawerProvider>
-    </ChakraProvider>
-  ) 
+if (process.env.NODE_ENV === "development") {
+  makeServer();
 }
 
-export default MyApp
+
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ChakraProvider theme={theme}>
+        <SidebarDrawerProvider>
+          <Component {...pageProps} />
+        </SidebarDrawerProvider>
+      </ChakraProvider>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
+  );
+}
+
+export default MyApp;
